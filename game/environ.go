@@ -111,6 +111,7 @@ func NewEnviron() *Environ {
 
 	e.ObjectIDChan = make(chan uint32, 100000)
 	id := adb.GetObjectID()
+	// account 库没有自增ID数据，创建起始值100000
 	if id == 0 {
 		id = 100000
 		adb.Table("basic").Create(&cm.Basic{ID: 1, ObjectID: id})

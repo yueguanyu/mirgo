@@ -141,6 +141,9 @@ func (d *GameData) loadDropFile(filename string) ([]*cm.DropInfo, error) {
 	if err != nil {
 		return nil, err
 	}
+	// if len(lines) == 0 {
+	// 	fmt.Printf("file lines 0, file: %s\n", filename)
+	// }
 
 	chanceReg := regexp.MustCompile(`(\d+)/(\d+)`)
 
