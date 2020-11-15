@@ -6,6 +6,7 @@ import (
 
 var settings *setting.Settings
 
+// DataRange 同屏同步最大距离 x<20&&y<20
 const DataRange = 20
 
 const MaxGroup = 5 // 小队的最大人数
