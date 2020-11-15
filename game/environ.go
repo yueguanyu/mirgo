@@ -65,6 +65,7 @@ func (e *Environ) Loop() {
 func (g *Environ) ServerStart() {
 
 	// 这里用cellnet 单线程模式。消息处理都在queue线程。无需再另开线程
+	// 创建服务器的事件队列，所有的消息，事件都会被投入这个队列处理
 	queue := cellnet.NewEventQueue()
 
 	acceptor := "tcp.Acceptor"
@@ -74,16 +75,19 @@ func (g *Environ) ServerStart() {
 		settings.Acceptor = "tcp"
 	}
 
-	p := peer.NewGenericPeer(acceptor, "server", settings.Addr, queue)
-	proc.BindProcessorHandler(p, "mir.server."+settings.Acceptor, g.Game.HandleEvent)
+	// 创建一个服务器的接受器(Acceptor)，接受客户端的连接
+	peerIns := peer.NewGenericPeer(acceptor, "server", settings.Addr, queue)
+	// 将接受器Peer与tcp.ltv的处理器绑定，并设置事件处理回调
+	// tcp.ltv处理器负责处理消息收发，使用私有的封包格式以及日志，RPC等处理
+	proc.BindProcessorHandler(peerIns, "mir.server."+settings.Acceptor, g.Game.HandleEvent)
 
 	timer.NewLoop(queue, time.Second/time.Duration(60), func(*timer.Loop) {
 		env.Loop()
 	}, nil).Start()
 
-	env.Peer = p
+	env.Peer = peerIns
 
-	p.Start()         // 开始侦听
+	peerIns.Start()   // 开始侦听
 	queue.StartLoop() // 事件队列开始循环
 	queue.Wait()      // 阻塞等待事件队列结束退出( 在另外的goroutine调用queue.StopLoop() )
 }

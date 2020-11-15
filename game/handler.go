@@ -13,11 +13,12 @@ import (
 type Game struct {
 }
 
+// HandleEvent Processer事件处理回调
 func (g *Game) HandleEvent(ev cellnet.Event) {
 	// g.Pool.Submit(NewTask(_HandleEvent, g, ev))
 
 	s := ev.Session()
-
+	// 处理Peer收到的各种事件
 	switch msg := ev.Message().(type) {
 	case *cellnet.SessionAccepted: // 有新的连接
 		g.SessionAccepted(s, msg)
