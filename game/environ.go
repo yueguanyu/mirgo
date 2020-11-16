@@ -44,6 +44,7 @@ type Environ struct {
 	GuildList  *GuildList
 }
 
+// Loop 游戏每帧主循环
 func (e *Environ) Loop() {
 	now := time.Now()
 	dt := now.Sub(e.lastFrame)
@@ -61,8 +62,8 @@ func (e *Environ) Loop() {
 	e.lastFrame = now
 }
 
-// ServerStart ...
-func (g *Environ) ServerStart() {
+// ServerStart cellnet启动服务
+func (e *Environ) ServerStart() {
 
 	// 这里用cellnet 单线程模式。消息处理都在queue线程。无需再另开线程
 	// 创建服务器的事件队列，所有的消息，事件都会被投入这个队列处理
@@ -79,7 +80,7 @@ func (g *Environ) ServerStart() {
 	peerIns := peer.NewGenericPeer(acceptor, "server", settings.Addr, queue)
 	// 将接受器Peer与tcp.ltv的处理器绑定，并设置事件处理回调
 	// tcp.ltv处理器负责处理消息收发，使用私有的封包格式以及日志，RPC等处理
-	proc.BindProcessorHandler(peerIns, "mir.server."+settings.Acceptor, g.Game.HandleEvent)
+	proc.BindProcessorHandler(peerIns, "mir.server."+settings.Acceptor, e.Game.HandleEvent)
 
 	timer.NewLoop(queue, time.Second/time.Duration(60), func(*timer.Loop) {
 		env.Loop()
